@@ -9,7 +9,7 @@ setup(
    install_requires=["pyspark==3.3.0"],
 
    # metadata to display on PyPIa
-   author="scauglog",
-   author_email="scauglog@example.com",
+   author="clodio",
+   author_email="clodio@example.com",
    description="spark cities",
 )

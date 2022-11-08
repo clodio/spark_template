@@ -159,6 +159,12 @@ spark-submit --master local ./fichier.py
 
 * Reprendre le code de votre application pour enchaîner l’exécution des fonction split_lat_long et departement écrire le résultat dans /refined/cities/v1/parquet
 
+```bash
+pytest tests/test_geospatial.py
+pytest -s tests/test_geospatial.py // pour voir les prints php
+launch.sh
+```
+
 ### Aggregation & Jointure
 
 * à partir du dataframe clean_cities
