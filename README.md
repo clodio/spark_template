@@ -172,6 +172,10 @@ launch.sh
 * sauvegarder le résultat dans un fichier csv unique trié par ordre décroissant de compte (le département contenant le plus de villes doit être sur la première ligne)
 * sauvegarder le résultat sur hdfs au format csv dans le dossier /refined/departement/v1/csv
 
+```python
+  # rechercher dans le code group_by_departments
+```
+
 ### UDF
 
 * Créer la fonction departement_udf qui a les mêmes paramètres d'entrée et sortie que la fonction département précédente, mais qui calcule correctement le département corse en utilisant une UDF (utiliser le test du chapitre précédent pour tester que votre fonction marche bien.
@@ -180,12 +184,26 @@ launch.sh
 * Faire une nouvelle fonction departement_fct qui gère le cas de la Corse sans UDF, mais uniquement avec les fonctions disponible dans sur les colonnes. vous pouvez par exemple utiliser les fonctions ; case, when
 * Une fois les fonctions terminées dans le main de votre application faire un benchmark pour voir laquelle des deux solutions est la plus rapide.
 
+```python
+  # rechercher dans le code @udf ou when
+```
+
 ### Window Function
 
 * À l'aide de window function à chaque ville ajouter les coordonnées GPS de la préfecture du département.
 * On la préfecture du département se situe dans la ville ayant le code postal le plus petit dans tout le département. Pour l’exercice on considère également que la Corse est un seul département (on ne sépare pas la haute corse et la corse du sud).
 * Une fois la préfecture trouvée, calculer la distance relative de chaque ville par rapport à la préfecture. On ne cherche pas une distance en km.
 * calculer la distance moyenne et médiane à la préfecture par département sauvegarder le résultat sur HDFS en csv dans le dossier /refined/departement/v3/csv
+
+```python
+  # voir dans le code
+  ## calculs stats
+  # /!\ les calculs sont complement erronée sur les dom/tom/monaco du fait de codes postaux particuliers
+  cities_to_stat = add_departement_column_from_postal_code(cities_clean)
+  cities_with_prefecture_geoloc_and_distance = geospatial.add_prefecture_geoloc_and_distance(cities_to_stat)
+  departement_distance_to_prefecture_stats = geospatial.get_distance_stats_from_prefecture(cities_with_prefecture_geoloc_and_distance)
+  Departments.write_stats(departement_distance_to_prefecture_stats)
+```
 
 ### Scala
 

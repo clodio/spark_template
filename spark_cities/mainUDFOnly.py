@@ -31,12 +31,9 @@ def main(spark):
   delta = end_datetime - start_datetime
   print('Methode 1 SANS udf sur la corse: ', delta)
 
-
-  departements_count.show()
-
+  # departements_count.show()
   departements_sort = Departments.sort_by_nb_locality(departements_count)
-  
-  departements_sort.show()
+  # departements_sort.show()
 
   # Methode 2 avec udf sur la corse
   start_datetime = datetime.now()

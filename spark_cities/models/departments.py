@@ -16,6 +16,10 @@ class Departments:
     df.write.mode("overwrite").csv('/refined/departement/v1/csv')
 
   @staticmethod
+  def write_stats(df):
+    df.write.mode("overwrite").csv('/refined/departement/v3/csv')
+
+  @staticmethod
   def sort_by_nb_locality(df):
     return df.orderBy(Departments.NB_LOCALITY, ascending=[0])
 

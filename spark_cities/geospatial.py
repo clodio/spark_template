@@ -50,49 +50,42 @@ def add_prefecture_geoloc_and_distance(df):
   window = Window.partitionBy(Departments.DEPARTEMENT).orderBy(Cities.CODE_POSTAL)
 
   df_with_prefecture_geoloc  = df.withColumn('geoloc_prefecture', F.first(Cities.COORDONNES_GPS, True).over(window))
-  df_with_prefecture_geoloc.show()
 
   df_with_distance_from_prefecture  = df_with_prefecture_geoloc.withColumn('geoloc_prefecture', F.first(Cities.COORDONNES_GPS, True).over(window))
   
   @udf('string')
   def distance(a,b):
-    a_lat = float(a.split(',')[0])
-    a_lon = float(a.split(',')[1])
-    b_lat = float(b.split(',')[0])
-    b_lon = float(b.split(',')[1])
-    # Todo : ce n'est pas un calcul de distance parfait du fait de la rotondite de la terre
+    if a is None or b is None:
+      # cas de mayotte
+      a_lat = 0
+      a_lon = 0
+      b_lat = 0
+      b_lon = 0
+    else:
+      a_lat = float(a.split(',')[0])
+      a_lon = float(a.split(',')[1])
+      b_lat = float(b.split(',')[0])
+      b_lon = float(b.split(',')[1])
+      # Todo : A ameliorer ce n'est pas un calcul de distance parfait du fait de la rotondite de la terre
     return math.sqrt(pow(abs(a_lat - b_lat),2)  + pow(abs(a_lon - b_lon),2))
-
-  df_with_distance_from_prefecture=df_with_prefecture_geoloc.withColumn('distance', distance(df_with_prefecture_geoloc["coordonnees_gps"],df_with_prefecture_geoloc["geoloc_prefecture"]))
-  df_with_distance_from_prefecture.show()
+  
+  df_with_distance_from_prefecture=df_with_prefecture_geoloc.withColumn('distance', distance(df_with_prefecture_geoloc[Cities.COORDONNES_GPS],df_with_prefecture_geoloc["geoloc_prefecture"]))
   
   return df_with_distance_from_prefecture
 
 
 def get_distance_stats_from_prefecture(df):
 
-  window = Window.partitionBy(Departments.DEPARTEMENT)
-
-  dist_avg = F.avg("distance").over(window)
-  dist_mean = F.mean("distance").over(window)
-  df_with_avg = df.withColumn("dist_avg", dist_avg)
-  df_with_avg_and_mean = df_with_avg.withColumn("dist_mean", dist_mean)
-  df_with_avg_and_mean.show()
+  # avec Window
+  # window = Window.partitionBy(Departments.DEPARTEMENT)
+  # dist_avg = F.avg("distance").over(window)
+  # dist_mean = F.mean("distance").over(window)
+  # df_with_avg = df.withColumn("dist_avg", dist_avg)
+  # df_with_avg_and_mean = df_with_avg.withColumn("dist_mean", dist_mean)
+  # df_with_avg_and_mean.show()
   
   df_with_stats = df.groupBy(Departments.DEPARTEMENT) \
       .agg(F.mean("distance").alias("dist_mean"), \
           F.avg("distance").alias("dist_avg") \
       )
   return df_with_stats
-
-  # return df_with_avg_and_mean
-
-# group_by departement  partitionBy 
-# sort orderBy 
-# analytic fisrt value 
-
-# * À l'aide de window function à chaque ville ajouter les coordonnées GPS de la préfecture du département.
-# * On la préfecture du département se situe dans la ville ayant le code postal le plus petit dans tout le département. Pour l’exercice on considère également que la Corse est un seul département (on ne sépare pas la haute corse et la corse du sud).
-# * Une fois la préfecture trouvée, calculer la distance relative de chaque ville par rapport à la préfecture. On ne cherche pas une distance en km.
-# * calculer la distance moyenne et médiane à la préfecture par département sauvegarder le résultat sur HDFS en csv dans le dossier /refined/departement/v3/csv
-
