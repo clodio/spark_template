@@ -1,3 +1,4 @@
+from gettext import dpgettext
 import pyspark.sql.functions as F
 import pyspark.sql.types as T
 from spark_cities.models.cities import Cities
@@ -6,6 +7,7 @@ from spark_cities.geospatial import add_departement_column_from_postal_code
 from spark_cities.geospatial import add_departement_column_from_postal_codeUDF
 from spark_cities.models.departments import Departments
 from datetime import datetime
+
 
 def main(spark):
   cities_df = Cities.read(spark)
@@ -38,6 +40,9 @@ def main(spark):
 
   departements_sort = Departments.sort_by_nb_locality(departements_count)
   departements_sort.show()
+
+
+
 
   Departments.write(departements_sort)
 
