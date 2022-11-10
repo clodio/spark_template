@@ -57,11 +57,11 @@ def add_prefecture_geoloc_and_distance(df):
   @udf('string')
   def distance(a,b):
     if a is None or b is None:
-      # cas de mayotte
-      a_lat = 0
-      a_lon = 0
-      b_lat = 0
-      b_lon = 0
+      # cas de mayotte non geolocalisee dans le fichier
+      a_lat = -12.7812298
+      a_lon = 45.2304999
+      b_lat = -12.7812298
+      b_lon = 45.2304999
     else:
       a_lat = float(a.split(',')[0])
       a_lon = float(a.split(',')[1])
