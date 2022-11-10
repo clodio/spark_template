@@ -209,3 +209,5 @@ launch.sh
 ### Scala
 
 réécrire votre application en scala
+
+cf. <https://github.com/clodio/spark_template_scala>
