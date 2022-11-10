@@ -199,6 +199,7 @@ launch.sh
   # voir dans le code
   ## calculs stats
   # /!\ les calculs sont complement erronée sur les dom/tom/monaco du fait de codes postaux particuliers
+  # il faudrait peut être virer en amont les geoloc vides ou les dom-tom
   cities_to_stat = add_departement_column_from_postal_code(cities_clean)
   cities_with_prefecture_geoloc_and_distance = geospatial.add_prefecture_geoloc_and_distance(cities_to_stat)
   departement_distance_to_prefecture_stats = geospatial.get_distance_stats_from_prefecture(cities_with_prefecture_geoloc_and_distance)

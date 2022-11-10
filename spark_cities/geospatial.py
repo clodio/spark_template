@@ -1,7 +1,7 @@
 from tokenize import Double
 from pyspark.sql import functions as F
 from pyspark.sql.functions import udf
-from pyspark.sql.types import StringType, DoubleType
+from pyspark.sql.types import StringType, DoubleType,FloatType
 import pyspark.sql.types as T
 from spark_cities.models.cities import Cities
 from spark_cities.models.departments import Departments
@@ -9,6 +9,7 @@ from pyspark.sql.functions import when
 from pyspark.sql.window import Window
 from pyspark.sql.functions import col
 import math
+import numpy as np
 
 def split_lat_long(df, lat_long_col):
 
@@ -76,16 +77,25 @@ def add_prefecture_geoloc_and_distance(df):
 
 def get_distance_stats_from_prefecture(df):
 
+  # Impossible avec agg et les fonctions par defaut car percentile_approx EXISTE seulement en spark > 3.1
+  # df_with_stats = df.groupBy(Departments.DEPARTEMENT) \
+  #     .agg(F.percentile_approx("distance", 0.5, 10000).alias("dist_mean"), \
+  #         F.avg("distance").alias("dist_avg") \
+  #     )
+  # F.percentile_approx("distance", 0.5, 10000).alias("dist_mean") --> EXISTE seulement en spark > 3.1
+  # df_with_stats.show()
+
   # avec Window
-  # window = Window.partitionBy(Departments.DEPARTEMENT)
-  # dist_avg = F.avg("distance").over(window)
-  # dist_mean = F.mean("distance").over(window)
-  # df_with_avg = df.withColumn("dist_avg", dist_avg)
-  # df_with_avg_and_mean = df_with_avg.withColumn("dist_mean", dist_mean)
-  # df_with_avg_and_mean.show()
-  
-  df_with_stats = df.groupBy(Departments.DEPARTEMENT) \
-      .agg(F.mean("distance").alias("dist_mean"), \
-          F.avg("distance").alias("dist_avg") \
-      )
-  return df_with_stats
+  window = Window.partitionBy(Departments.DEPARTEMENT)
+  df_with_avg = df.withColumn("dist_avg", F.avg("distance").over(window))
+
+  # percentile_approx(distance, 0.5) --> calcule la mediane
+  magic_percentile = F.expr('percentile_approx(distance, 0.5)').over(window)
+  df_with_avg_and_mean = df_with_avg.withColumn("dist_mean", magic_percentile)
+
+  # Menage
+  df_cleaned = df_with_avg_and_mean.select('departement','dist_mean','dist_avg').drop_duplicates()
+  df_cleaned.show()
+
+  return df_cleaned
+  # return df_with_stats

@@ -92,8 +92,10 @@ def test_get_distance_stats_from_prefecture(spark_session):
     cities = [      ('10000', '10','prefecture 10000', '44.700000000,5.300000000', '0.0'), \
                     ('10001', '10','ville 1', '44.800000000,5.400000000', '0.14142135623730587'), \
                     ('10002', '10','ville 2', '44.900000000,5.500000000', '0.2828427124746161'), \
+                    # ('10003', '10','ville 3', '44.8200000000,5.4200000000', '0.1428427124746161'), \
                     ('30000', '30','prefecture 30000', '45.700000000,6.300000000', '0.0'), \
-                    ('30001', '30','ville 3', '45.800000000,6.400000000', '0.14142135623730587') \
+                    ('30001', '30','ville 3', '45.800000000,6.400000000', '0.14142135623730587'), \
+                    ('30002', '30','ville 4', '45.810000000,6.410000000', '0.14242135623730587') \
                 ]
     input_df = spark_session.createDataFrame(cities, ['code_postal', 'departement', 'commune', 'coordonnees_gps', 'distance'])
 
@@ -104,7 +106,7 @@ def test_get_distance_stats_from_prefecture(spark_session):
 
     # THEN
     expected = [
-        {'departement':'10', "dist_mean": 0.14142135623730734, "dist_avg": 0.14142135623730734},
-        {'departement':'30', "dist_mean": 0.07071067811865293, "dist_avg": 0.070710678118652934}
+        {'departement':'10', "dist_mean": 0.14142135623730587, "dist_avg": 0.14142135623730734},
+        {'departement':'30', "dist_mean": 0.14142135623730587, "dist_avg": 0.09461423749153725}
     ]
     assert expected == actual
